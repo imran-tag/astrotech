@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+/front_end/dist/
+/front_end/.angular/
+/front_end/tmp/
+/front_end/out-tsc/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Testing
+/front_end/coverage/
+
+# Misc
+*.sql
+!postgresql-schema.sql
+.cache
