@@ -12,16 +12,16 @@ async function register(req, res) {
     const { email, password, full_name } = req.body;
     if (!email || !password) return res.status(400).json({ message: 'Email et mot de passe requis' });
 
-    const [rows] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
+    const [rows] = await pool.execute('SELECT id FROM users WHERE email = ?', [email]);
     if (rows.length) return res.status(409).json({ message: 'Email déjà utilisé' });
 
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
-    const [result] = await pool.query(
-      'INSERT INTO users (email, password_hash, full_name) VALUES (?, ?, ?)',
+    const [result] = await pool.execute(
+      'INSERT INTO users (email, password_hash, full_name) VALUES (?, ?, ?) RETURNING id',
       [email, hash, full_name || null]
     );
 
-    const userId = result.insertId;
+    const userId = result[0].id;
     const token = jwt.sign({ id: userId, email }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
     res.status(201).json({ token, user: { id: userId, email, full_name } });
   } catch (err) {
@@ -35,9 +35,8 @@ async function login(req, res) {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ message: 'Email et mot de passe requis' });
 
-    const [rows] = await pool.query('SELECT id, password_hash, full_name FROM users WHERE email = ?', [email]);
-    console.log([rows]);
-    
+    const [rows] = await pool.execute('SELECT id, password_hash, full_name FROM users WHERE email = ?', [email]);
+
     if (!rows.length) return res.status(401).json({ message: 'Identifiants incorrects' });
 
     const user = rows[0];
@@ -55,7 +54,7 @@ async function login(req, res) {
 async function me(req, res) {
   try {
     const userId = req.user.id;
-    const [rows] = await pool.query('SELECT id, email, full_name, role, date_creation FROM users WHERE id = ?', [userId]);
+    const [rows] = await pool.execute('SELECT id, email, full_name, role, date_creation FROM users WHERE id = ?', [userId]);
     if (!rows.length) return res.status(404).json({ message: 'Utilisateur introuvable' });
     res.json({ user: rows[0] });
   } catch (err) {
