@@ -4,8 +4,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production",
+    "build": "npm run clean && ng build --configuration production",
     "build:dev": "ng build",
+    "clean": "rm -rf dist .angular",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

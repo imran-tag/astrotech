@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: astrotech-frontend
+    env: static
+    rootDir: front_end
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist/astro-tech
+    envVars:
+      - key: NODE_VERSION
+        value: 20.11.0
+      - key: NODE_ENV
+        value: production
